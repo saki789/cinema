@@ -1,0 +1,52 @@
+### Vite React Movie App Setup
+
+1. **Initialize Vite React App**
+   - Command: `npm create vite@latest movie-app --template react`
+   - Navigate to the project folder: `cd movie-app`
+   - Install dependencies: `npm install`
+   - Install additional libraries: `npm install axios react-router-dom`
+
+2. **Create `MovieGrid` Component**
+   - File: `src/components/MovieGrid.jsx`
+   - Purpose: Fetches and displays a list of movies from the backend API.
+
+3. **Set Up Routing**
+   - File: `src/App.jsx`
+   - Purpose: Configures routing using `react-router-dom` to display the `MovieGrid` component.
+
+4. **Run Vite App**
+   - Command: `npm run dev`
+   - Access the app at `http://localhost:5173`
+
+### Node.js and Express Backend Setup
+
+1. **Initialize Node.js Project**
+   - Create a new directory for the backend: `mkdir backend`
+   - Navigate to the directory: `cd backend`
+   - Initialize project: `npm init -y`
+   - Install dependencies: `npm install express cors`
+
+2. **Create Backend Server**
+   - File: `backend/server.js`
+   - Purpose: Provides a REST API to fetch movie data. Example data includes `Inception` and `Interstellar`.
+
+3. **Run Backend Server**
+   - Command: `node server.js`
+   - Access the API at `http://localhost:3001/movies`
+
+### Material-UI Layout
+
+1. **Set Up Layout with Drawer and AppBar**
+   - File: `src/components/Layout.jsx`
+   - Imports: Various Material-UI components including `Drawer`, `AppBar`, `Toolbar`, `List`, etc.
+   - Purpose: Implements a layout with a collapsible sidebar (Drawer) and a top AppBar for navigation.
+
+2. **Integrate `MovieGrid` into Layout**
+   - The `MovieGrid` component is displayed in the main content area of the layout.
+
+### Summary
+- Created a Vite React app with a `MovieGrid` component for displaying movie data.
+- Set up a Node.js backend server with Express to serve movie data.
+- Integrated Material-UI components for layout, including a Drawer and AppBar.
+- Connected the React frontend with the Express backend to fetch and display movie data.
+
