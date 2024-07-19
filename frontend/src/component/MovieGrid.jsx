@@ -8,19 +8,23 @@ import {
   CardMedia,
   Button,
   IconButton,
+  Dialog,
+  DialogContent,
+  DialogTitle,
 } from "@mui/material";
 import StarIcon from "@mui/icons-material/Star";
 import ShareIcon from "@mui/icons-material/Share";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import { styled } from "@mui/material/styles";
+import ReactPlayer from "react-player";
 
 const MovieCard = styled(Card)(({ theme }) => ({
-  width: 280, // Adjusted width
+  width: 280,
   backgroundColor: theme.palette.background.paper,
   color: theme.palette.text.primary,
   margin: theme.spacing(2),
   position: "relative",
-  overflow: "hidden", // Prevents overflow
+  overflow: "hidden",
 }));
 
 const Overlay = styled(Box)(({ theme }) => ({
@@ -30,16 +34,19 @@ const Overlay = styled(Box)(({ theme }) => ({
   width: "100%",
   background: "rgba(0, 0, 0, 0.6)",
   color: theme.palette.common.white,
-  padding: theme.spacing(1),
+  padding: theme.spacing(2),
   display: "flex",
   flexDirection: "column",
   justifyContent: "flex-end",
+  height: "100%",
 }));
 
 const MovieGrid = () => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [openPlayer, setOpenPlayer] = useState(false);
+  const [currentMovie, setCurrentMovie] = useState(null);
 
   useEffect(() => {
     const fetchMovies = async () => {
@@ -65,6 +72,16 @@ const MovieGrid = () => {
 
     fetchMovies();
   }, []);
+
+  const handleWatchClick = (movie) => {
+    setCurrentMovie(movie);
+    setOpenPlayer(true);
+  };
+
+  const handleClosePlayer = () => {
+    setOpenPlayer(false);
+    setCurrentMovie(null);
+  };
 
   if (loading) {
     return (
@@ -99,49 +116,78 @@ const MovieGrid = () => {
   }
 
   return (
-    <Grid container spacing={2} justifyContent="center">
-      {movies.map((movie) => (
-        <Grid item key={movie.id}>
-          <MovieCard>
-            <Box sx={{ position: "relative" }}>
-              <CardMedia
-                component="img"
-                height="400" // Adjusted height to fit the card
-                image={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
-                alt={movie.title}
-              />
-              <Overlay>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <Typography variant="body2">
-                    <StarIcon color="primary" /> {movie.vote_average}
-                  </Typography>
-                  <Box>
-                    <IconButton color="primary" aria-label="share">
-                      <ShareIcon />
-                    </IconButton>
-                    <IconButton color="primary" aria-label="love">
-                      <FavoriteIcon />
-                    </IconButton>
+    <>
+      <Grid container spacing={2} justifyContent="center">
+        {movies.map((movie) => (
+          <Grid item key={movie.id}>
+            <MovieCard>
+              <Box sx={{ position: "relative" }}>
+                <CardMedia
+                  component="img"
+                  height="400"
+                  image={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
+                  alt={movie.title}
+                />
+                <Overlay>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      mb: 1,
+                    }}
+                  >
+                    <Typography variant="body2">
+                      <StarIcon color="primary" /> {movie.vote_average}
+                    </Typography>
+                    <Box>
+                      <IconButton color="primary" aria-label="share">
+                        <ShareIcon />
+                      </IconButton>
+                      <IconButton color="primary" aria-label="love">
+                        <FavoriteIcon />
+                      </IconButton>
+                    </Box>
                   </Box>
-                </Box>
-                <Box sx={{ mt: 1 }}>
-                  <Typography variant="h6" component="div">
-                    {movie.title}
-                  </Typography>
-                  <Description movie={movie} />
-                </Box>
-              </Overlay>
-            </Box>
-          </MovieCard>
-        </Grid>
-      ))}
-    </Grid>
+                  <Box>
+                    <Typography variant="h6" component="div" sx={{ mb: 1 }}>
+                      {movie.title}
+                    </Typography>
+                    <Description movie={movie} />
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => handleWatchClick(movie)}
+                    >
+                      Watch
+                    </Button>
+                  </Box>
+                </Overlay>
+              </Box>
+            </MovieCard>
+          </Grid>
+        ))}
+      </Grid>
+
+      <Dialog
+        open={openPlayer}
+        onClose={handleClosePlayer}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>Watch {currentMovie?.title}</DialogTitle>
+        <DialogContent>
+          {currentMovie && (
+            <ReactPlayer
+              url={`https://example.com/path-to-your-movie/${currentMovie.id}.mp4`} // Replace with actual URL
+              width="100%"
+              height="auto"
+              controls
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
@@ -154,7 +200,16 @@ const Description = ({ movie }) => {
 
   return (
     <>
-      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+      <Typography
+        variant="body2"
+        color="text.secondary"
+        sx={{
+          mt: 1,
+          whiteSpace: "pre-wrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+      >
         {expanded ? movie.overview : `${movie.overview.substring(0, 100)}...`}
       </Typography>
       <Button size="small" color="primary" onClick={handleExpandClick}>
