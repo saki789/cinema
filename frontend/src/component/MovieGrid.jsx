@@ -1,3 +1,6 @@
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import Slider from "react-slick";
 import { styled } from "@mui/material/styles";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
@@ -13,9 +16,9 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShareIcon from "@mui/icons-material/Share";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { useEffect, useState } from "react";
-import { Container, Grid } from "@mui/material";
-import axios from "axios";
+import Container from "@mui/material/Container";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -48,15 +51,42 @@ export default function RecipeReviewCard() {
     setExpanded(!expanded);
   };
 
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 3,
+    slidesToScroll: 1,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 1,
+          infinite: true,
+          dots: true,
+        },
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          initialSlide: 1,
+        },
+      },
+    ],
+  };
+
   return (
     <Container>
       <Typography variant="h4" gutterBottom>
-        Movie List
+        Marvel
       </Typography>
-      <Grid container spacing={3}>
+      <Slider {...settings}>
         {movies.map((movie) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={movie.id}>
-            <Card sx={{ maxWidth: 345 }}>
+          <div key={movie.id}>
+            <Card sx={{ maxWidth: 345, margin: "auto" }}>
               <CardHeader
                 avatar={
                   <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
@@ -75,7 +105,7 @@ export default function RecipeReviewCard() {
                 component="img"
                 height="194"
                 image={movie.image}
-                alt="Paella dish"
+                alt={movie.title}
               />
               <CardContent>
                 <Typography variant="body2" color="text.secondary">
@@ -99,12 +129,14 @@ export default function RecipeReviewCard() {
                 </ExpandMore>
               </CardActions>
               <Collapse in={expanded} timeout="auto" unmountOnExit>
-                <CardContent></CardContent>
+                <CardContent>
+                  {/* Additional content can go here */}
+                </CardContent>
               </Collapse>
             </Card>
-          </Grid>
+          </div>
         ))}
-      </Grid>
+      </Slider>
     </Container>
   );
 }
