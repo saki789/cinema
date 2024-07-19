@@ -5,19 +5,35 @@ import {
   Grid,
   Typography,
   Card,
-  CardContent,
   CardMedia,
-  CardActions,
   Button,
+  IconButton,
 } from "@mui/material";
 import StarIcon from "@mui/icons-material/Star";
+import ShareIcon from "@mui/icons-material/Share";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import { styled } from "@mui/material/styles";
 
 const MovieCard = styled(Card)(({ theme }) => ({
-  maxWidth: 345,
+  width: 280, // Adjusted width
   backgroundColor: theme.palette.background.paper,
   color: theme.palette.text.primary,
   margin: theme.spacing(2),
+  position: "relative",
+  overflow: "hidden", // Prevents overflow
+}));
+
+const Overlay = styled(Box)(({ theme }) => ({
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  width: "100%",
+  background: "rgba(0, 0, 0, 0.6)",
+  color: theme.palette.common.white,
+  padding: theme.spacing(1),
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "flex-end",
 }));
 
 const MovieGrid = () => {
@@ -87,35 +103,64 @@ const MovieGrid = () => {
       {movies.map((movie) => (
         <Grid item key={movie.id}>
           <MovieCard>
-            <CardMedia
-              component="img"
-              height="140"
-              image={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
-              alt={movie.title}
-            />
-            <CardContent>
-              <Typography gutterBottom variant="h5" component="div">
-                {movie.title}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {movie.overview}
-              </Typography>
-            </CardContent>
-            <CardActions>
-              <Button size="small" color="primary">
-                Learn More
-              </Button>
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                <StarIcon color="primary" />
-                <Typography variant="body2" sx={{ ml: 0.5 }}>
-                  {movie.vote_average}
-                </Typography>
-              </Box>
-            </CardActions>
+            <Box sx={{ position: "relative" }}>
+              <CardMedia
+                component="img"
+                height="400" // Adjusted height to fit the card
+                image={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
+                alt={movie.title}
+              />
+              <Overlay>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <Typography variant="body2">
+                    <StarIcon color="primary" /> {movie.vote_average}
+                  </Typography>
+                  <Box>
+                    <IconButton color="primary" aria-label="share">
+                      <ShareIcon />
+                    </IconButton>
+                    <IconButton color="primary" aria-label="love">
+                      <FavoriteIcon />
+                    </IconButton>
+                  </Box>
+                </Box>
+                <Box sx={{ mt: 1 }}>
+                  <Typography variant="h6" component="div">
+                    {movie.title}
+                  </Typography>
+                  <Description movie={movie} />
+                </Box>
+              </Overlay>
+            </Box>
           </MovieCard>
         </Grid>
       ))}
     </Grid>
+  );
+};
+
+const Description = ({ movie }) => {
+  const [expanded, setExpanded] = useState(false);
+
+  const handleExpandClick = () => {
+    setExpanded(!expanded);
+  };
+
+  return (
+    <>
+      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+        {expanded ? movie.overview : `${movie.overview.substring(0, 100)}...`}
+      </Typography>
+      <Button size="small" color="primary" onClick={handleExpandClick}>
+        {expanded ? "Show Less" : "Show More"}
+      </Button>
+    </>
   );
 };
 

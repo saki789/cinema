@@ -44,9 +44,18 @@
 2. **Integrate `MovieGrid` into Layout**
    - The `MovieGrid` component is displayed in the main content area of the layout.
 
-### Summary
+### 19/7/2024
 - Created a Vite React app with a `MovieGrid` component for displaying movie data.
 - Set up a Node.js backend server with Express to serve movie data.
 - Integrated Material-UI components for layout, including a Drawer and AppBar.
 - Connected the React frontend with the Express backend to fetch and display movie data.
 
+feat: Enhance MovieGrid component with error handling and loading state
+
+- Added network response check to handle non-ok responses.
+- Added data format check to ensure 'data.results' is defined before setting the movies state.
+- Implemented error handling to display informative messages in case of failures.
+- Included a loading state with a CircularProgress indicator while fetching data.
+- Improved user experience by displaying error messages and handling undefined 'data.results'.
+
+This update ensures robustness and provides better feedback for different failure scenarios.
