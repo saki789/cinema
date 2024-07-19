@@ -19,6 +19,13 @@ import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
 import MovieGrid from "./MovieGrid";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+
+const darkTheme = createTheme({
+  palette: {
+    mode: "dark",
+  },
+});
 
 const drawerWidth = 240;
 
@@ -100,41 +107,79 @@ export default function Layout() {
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <CssBaseline />
-      <AppBar position="fixed" open={open}>
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{
-              marginRight: 5,
-              ...(open && { display: "none" }),
-            }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            Mini variant drawer
-          </Typography>
-          <List sx={{ display: "flex", flexDirection: "row" }}>
+    <ThemeProvider theme={darkTheme}>
+      <Box sx={{ display: "flex" }}>
+        <CssBaseline />
+        <AppBar position="fixed" open={open}>
+          <Toolbar>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={handleDrawerOpen}
+              edge="start"
+              sx={{
+                marginRight: 5,
+                ...(open && { display: "none" }),
+              }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography variant="h6" noWrap component="div">
+              Mini variant drawer
+            </Typography>
+            <List sx={{ display: "flex", flexDirection: "row" }}>
+              {[
+                "Top Rated",
+                "Most Popular",
+                "Upcoming",
+                "Now Playing",
+                "Trending",
+                "Recently Released",
+                "Classics",
+                "Award Winners",
+              ].map((text, index) => (
+                <ListItem
+                  key={text}
+                  disablePadding
+                  sx={{ display: "inline-block", width: "auto" }}
+                >
+                  <ListItemButton
+                    sx={{
+                      minHeight: 48,
+                      justifyContent: open ? "initial" : "center",
+                      px: 2.5,
+                    }}
+                  >
+                    <ListItemText primary={text} sx={{ opacity: 1 }} />
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </List>
+          </Toolbar>
+        </AppBar>
+        <Drawer variant="permanent" open={open}>
+          <DrawerHeader>
+            <IconButton onClick={handleDrawerClose}>
+              {theme.direction === "rtl" ? (
+                <ChevronRightIcon />
+              ) : (
+                <ChevronLeftIcon />
+              )}
+            </IconButton>
+          </DrawerHeader>
+          <Divider />
+          <List>
             {[
-              "Top Rated",
-              "Most Popular",
-              "Upcoming",
-              "Now Playing",
-              "Trending",
-              "Recently Released",
-              "Classics",
-              "Award Winners",
+              "Action",
+              "Comedy",
+              "Drama",
+              "Horror",
+              "Science Fiction",
+              "Romance",
+              "Thriller",
+              "Animated",
             ].map((text, index) => (
-              <ListItem
-                key={text}
-                disablePadding
-                sx={{ display: "inline-block", width: "auto" }}
-              >
+              <ListItem key={text} disablePadding sx={{ display: "block" }}>
                 <ListItemButton
                   sx={{
                     minHeight: 48,
@@ -151,62 +196,17 @@ export default function Layout() {
                   >
                     {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
                   </ListItemIcon>
-                  <ListItemText primary={text} sx={{ opacity: 1 }} />
+                  <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
                 </ListItemButton>
               </ListItem>
             ))}
           </List>
-        </Toolbar>
-      </AppBar>
-      <Drawer variant="permanent" open={open}>
-        <DrawerHeader>
-          <IconButton onClick={handleDrawerClose}>
-            {theme.direction === "rtl" ? (
-              <ChevronRightIcon />
-            ) : (
-              <ChevronLeftIcon />
-            )}
-          </IconButton>
-        </DrawerHeader>
-        <Divider />
-        <List>
-          {[
-            "Action",
-            "Comedy",
-            "Drama",
-            "Horror",
-            "Science Fiction",
-            "Romance",
-            "Thriller",
-            "Animated",
-          ].map((text, index) => (
-            <ListItem key={text} disablePadding sx={{ display: "block" }}>
-              <ListItemButton
-                sx={{
-                  minHeight: 48,
-                  justifyContent: open ? "initial" : "center",
-                  px: 2.5,
-                }}
-              >
-                <ListItemIcon
-                  sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : "auto",
-                    justifyContent: "center",
-                  }}
-                >
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                </ListItemIcon>
-                <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-      </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-        <DrawerHeader />
-        <MovieGrid />
+        </Drawer>
+        <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+          <DrawerHeader />
+          <MovieGrid />
+        </Box>
       </Box>
-    </Box>
+    </ThemeProvider>
   );
 }
