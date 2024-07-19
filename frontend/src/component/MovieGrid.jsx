@@ -11,6 +11,7 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
+  DialogActions,
 } from "@mui/material";
 import StarIcon from "@mui/icons-material/Star";
 import ShareIcon from "@mui/icons-material/Share";
@@ -45,7 +46,7 @@ const MovieGrid = () => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [openPlayer, setOpenPlayer] = useState(false);
+  const [openVideoOptions, setOpenVideoOptions] = useState(false);
   const [currentMovie, setCurrentMovie] = useState(null);
 
   useEffect(() => {
@@ -59,7 +60,25 @@ const MovieGrid = () => {
         }
         const data = await response.json();
         if (data.results) {
-          setMovies(data.results);
+          const moviesWithTrailers = await Promise.all(
+            data.results.map(async (movie) => {
+              const trailerResponse = await fetch(
+                `https://api.themoviedb.org/3/movie/${movie.id}/videos?api_key=e61ff087a286341b7b33fb21f1ad8a47`
+              );
+              const trailerData = await trailerResponse.json();
+              const trailer = trailerData.results.find(
+                (v) => v.type === "Trailer"
+              );
+              return {
+                ...movie,
+                trailerUrl: trailer
+                  ? `https://www.youtube.com/watch?v=${trailer.key}`
+                  : null,
+                fullMovieUrl: null, // Placeholder for full movie URL
+              };
+            })
+          );
+          setMovies(moviesWithTrailers);
         } else {
           throw new Error("Data format error");
         }
@@ -73,15 +92,18 @@ const MovieGrid = () => {
     fetchMovies();
   }, []);
 
-  const handleWatchClick = (movie) => {
+  const handleOpenVideoOptions = (movie) => {
     setCurrentMovie(movie);
-    setOpenPlayer(true);
+    setOpenVideoOptions(true);
   };
 
-  const handleClosePlayer = () => {
-    setOpenPlayer(false);
+  const handleCloseVideoOptions = () => {
+    setOpenVideoOptions(false);
     setCurrentMovie(null);
   };
+
+  const getTrailerUrl = () => currentMovie?.trailerUrl;
+  const getFullMovieUrl = () => currentMovie?.fullMovieUrl;
 
   if (loading) {
     return (
@@ -157,7 +179,7 @@ const MovieGrid = () => {
                     <Button
                       variant="contained"
                       color="primary"
-                      onClick={() => handleWatchClick(movie)}
+                      onClick={() => handleOpenVideoOptions(movie)}
                     >
                       Watch
                     </Button>
@@ -170,22 +192,55 @@ const MovieGrid = () => {
       </Grid>
 
       <Dialog
-        open={openPlayer}
-        onClose={handleClosePlayer}
-        maxWidth="md"
+        open={openVideoOptions}
+        onClose={handleCloseVideoOptions}
         fullWidth
+        maxWidth="lg" // Adjust this for different screen sizes
+        PaperProps={{
+          style: {
+            padding: 0,
+            overflow: "hidden",
+          },
+        }}
       >
-        <DialogTitle>Watch {currentMovie?.title}</DialogTitle>
-        <DialogContent>
-          {currentMovie && (
+        <DialogTitle>{currentMovie?.title}</DialogTitle>
+        <DialogContent
+          sx={{
+            position: "relative",
+            padding: 0,
+            overflow: "hidden",
+            paddingBottom: "56.25%", // 16:9 aspect ratio
+          }}
+        >
+          {getTrailerUrl() && (
             <ReactPlayer
-              url={`https://example.com/path-to-your-movie/${currentMovie.id}.mp4`} // Replace with actual URL
+              url={getTrailerUrl()}
               width="100%"
-              height="auto"
+              height="100%"
               controls
+              style={{ position: "absolute", top: 0, left: 0 }}
             />
           )}
+          {!getTrailerUrl() && (
+            <Typography variant="body1" color="text.secondary" sx={{ mt: 2 }}>
+              No trailer available.
+            </Typography>
+          )}
         </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseVideoOptions} color="primary">
+            Close
+          </Button>
+          {getFullMovieUrl() && (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => window.open(getFullMovieUrl(), "_blank")}
+            >
+              Watch Full Movie
+            </Button>
+          )}
+        </DialogActions>
       </Dialog>
     </>
   );
