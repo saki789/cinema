@@ -179,7 +179,7 @@ export default function Layout() {
               }}
             />
             <Typography variant="h6" noWrap component="div">
-              Bogo Movies
+              Bogo
             </Typography>
             <List sx={{ display: "flex", flexDirection: "row" }}>
               {[
@@ -188,7 +188,6 @@ export default function Layout() {
                 "Upcoming",
                 "Now Playing",
                 "Trending",
-                "Recently Released",
                 "Classics",
                 "Award Winners",
               ].map((text, index) => (

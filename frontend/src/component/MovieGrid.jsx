@@ -81,7 +81,7 @@ export default function RecipeReviewCard() {
   return (
     <Container>
       <Typography variant="h4" gutterBottom>
-        Marvel
+        Recently Released
       </Typography>
       <Slider {...settings}>
         {movies.map((movie) => (
