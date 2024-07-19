@@ -20,6 +20,7 @@ import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
 import MovieGrid from "./MovieGrid";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import cinemaLogo from "../images/lOGO.png";
 
 const darkTheme = createTheme({
   palette: {
@@ -124,8 +125,17 @@ export default function Layout() {
             >
               <MenuIcon />
             </IconButton>
+            <img
+              src={cinemaLogo}
+              alt="Cinema Logo"
+              style={{
+                maxWidth: "150px", // Adjust as needed
+                maxHeight: "60px", // Adjust as needed
+                objectFit: "contain",
+              }}
+            />
             <Typography variant="h6" noWrap component="div">
-              Mini variant drawer
+              Bogo Movies
             </Typography>
             <List sx={{ display: "flex", flexDirection: "row" }}>
               {[
