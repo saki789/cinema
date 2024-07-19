@@ -1,5 +1,10 @@
 import * as React from "react";
-import { styled, useTheme } from "@mui/material/styles";
+import {
+  styled,
+  useTheme,
+  ThemeProvider,
+  createTheme,
+} from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import MuiDrawer from "@mui/material/Drawer";
 import MuiAppBar from "@mui/material/AppBar";
@@ -19,10 +24,9 @@ import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
 import MovieGrid from "./MovieGrid";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
 import cinemaLogo from "../images/lOGO.png";
 import SearchIcon from "@mui/icons-material/Search";
-import { alpha, InputBase } from "@mui/material";
+import { alpha, Avatar, InputBase } from "@mui/material";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -54,7 +58,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   width: "100%",
   "& .MuiInputBase-input": {
     padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
     transition: theme.transitions.create("width"),
     [theme.breakpoints.up("sm")]: {
@@ -100,7 +103,6 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   alignItems: "center",
   justifyContent: "flex-end",
   padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
   ...theme.mixins.toolbar,
 }));
 
@@ -173,8 +175,8 @@ export default function Layout() {
               src={cinemaLogo}
               alt="Cinema Logo"
               style={{
-                maxWidth: "150px", // Adjust as needed
-                maxHeight: "60px", // Adjust as needed
+                maxWidth: "150px",
+                maxHeight: "60px",
                 objectFit: "contain",
               }}
             />
@@ -190,7 +192,7 @@ export default function Layout() {
                 "Trending",
                 "Classics",
                 "Award Winners",
-              ].map((text, index) => (
+              ].map((text) => (
                 <ListItem
                   key={text}
                   disablePadding
@@ -208,7 +210,8 @@ export default function Layout() {
                 </ListItem>
               ))}
             </List>
-            <Search>
+            <Box sx={{ flexGrow: 1 }} />
+            <Search sx={{ marginRight: 2 }}>
               <SearchIconWrapper>
                 <SearchIcon />
               </SearchIconWrapper>
@@ -217,6 +220,8 @@ export default function Layout() {
                 inputProps={{ "aria-label": "search" }}
               />
             </Search>
+            <Box sx={{ flexGrow: 1 }} />
+            <Avatar src="/broken-image.jpg" />
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={open}>
@@ -263,8 +268,18 @@ export default function Layout() {
               </ListItem>
             ))}
           </List>
+          <Divider />
         </Drawer>
-        <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            p: 3,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
           <DrawerHeader />
           <MovieGrid />
         </Box>
