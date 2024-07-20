@@ -47,41 +47,18 @@ const MovieGrid = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [openVideoOptions, setOpenVideoOptions] = useState(false);
+  const [openFullMovie, setOpenFullMovie] = useState(false);
   const [currentMovie, setCurrentMovie] = useState(null);
 
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const response = await fetch(
-          "https://api.themoviedb.org/3/movie/popular?api_key=e61ff087a286341b7b33fb21f1ad8a47"
-        );
+        const response = await fetch("http://localhost:3001/movies"); // Update this to your backend URL
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
         const data = await response.json();
-        if (data.results) {
-          const moviesWithTrailers = await Promise.all(
-            data.results.map(async (movie) => {
-              const trailerResponse = await fetch(
-                `https://api.themoviedb.org/3/movie/${movie.id}/videos?api_key=e61ff087a286341b7b33fb21f1ad8a47`
-              );
-              const trailerData = await trailerResponse.json();
-              const trailer = trailerData.results.find(
-                (v) => v.type === "Trailer"
-              );
-              return {
-                ...movie,
-                trailerUrl: trailer
-                  ? `https://www.youtube.com/watch?v=${trailer.key}`
-                  : null,
-                fullMovieUrl: null, // Placeholder for full movie URL
-              };
-            })
-          );
-          setMovies(moviesWithTrailers);
-        } else {
-          throw new Error("Data format error");
-        }
+        setMovies(data);
         setLoading(false);
       } catch (error) {
         setError(error.message);
@@ -99,6 +76,16 @@ const MovieGrid = () => {
 
   const handleCloseVideoOptions = () => {
     setOpenVideoOptions(false);
+    setCurrentMovie(null);
+  };
+
+  const handleOpenFullMovie = (movie) => {
+    setCurrentMovie(movie);
+    setOpenFullMovie(true);
+  };
+
+  const handleCloseFullMovie = () => {
+    setOpenFullMovie(false);
     setCurrentMovie(null);
   };
 
@@ -147,7 +134,7 @@ const MovieGrid = () => {
                 <CardMedia
                   component="img"
                   height="400"
-                  image={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
+                  image={movie.poster_url} // Ensure your database has this field
                   alt={movie.title}
                 />
                 <Overlay>
@@ -160,7 +147,7 @@ const MovieGrid = () => {
                     }}
                   >
                     <Typography variant="body2">
-                      <StarIcon color="primary" /> {movie.vote_average}
+                      <StarIcon color="primary" /> {movie.rating}
                     </Typography>
                     <Box>
                       <IconButton color="primary" aria-label="share">
@@ -176,13 +163,25 @@ const MovieGrid = () => {
                       {movie.title}
                     </Typography>
                     <Description movie={movie} />
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={() => handleOpenVideoOptions(movie)}
-                    >
-                      Watch
-                    </Button>
+                    <Box sx={{ display: "flex", gap: 1 }}>
+                      {movie.trailerUrl && (
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={() => handleOpenVideoOptions(movie)}
+                        >
+                          Trailer
+                        </Button>
+                      )}
+                      {/* Always show Full Movie button for demonstration */}
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleOpenFullMovie(movie)}
+                      >
+                        Full Movie
+                      </Button>
+                    </Box>
                   </Box>
                 </Overlay>
               </Box>
@@ -195,7 +194,7 @@ const MovieGrid = () => {
         open={openVideoOptions}
         onClose={handleCloseVideoOptions}
         fullWidth
-        maxWidth="lg" // Adjust this for different screen sizes
+        maxWidth="lg"
         PaperProps={{
           style: {
             padding: 0,
@@ -231,15 +230,49 @@ const MovieGrid = () => {
           <Button onClick={handleCloseVideoOptions} color="primary">
             Close
           </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openFullMovie}
+        onClose={handleCloseFullMovie}
+        fullWidth
+        maxWidth="lg"
+        PaperProps={{
+          style: {
+            padding: 0,
+            overflow: "hidden",
+          },
+        }}
+      >
+        <DialogTitle>{currentMovie?.title}</DialogTitle>
+        <DialogContent
+          sx={{
+            position: "relative",
+            padding: 0,
+            overflow: "hidden",
+            paddingBottom: "56.25%", // 16:9 aspect ratio
+          }}
+        >
           {getFullMovieUrl() && (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => window.open(getFullMovieUrl(), "_blank")}
-            >
-              Watch Full Movie
-            </Button>
+            <ReactPlayer
+              url={getFullMovieUrl()}
+              width="100%"
+              height="100%"
+              controls
+              style={{ position: "absolute", top: 0, left: 0 }}
+            />
           )}
+          {!getFullMovieUrl() && (
+            <Typography variant="body1" color="text.secondary" sx={{ mt: 2 }}>
+              No full movie available.
+            </Typography>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseFullMovie} color="primary">
+            Close
+          </Button>
         </DialogActions>
       </Dialog>
     </>
@@ -259,17 +292,22 @@ const Description = ({ movie }) => {
         variant="body2"
         color="text.secondary"
         sx={{
-          mt: 1,
-          whiteSpace: "pre-wrap",
+          mb: 1,
           overflow: "hidden",
           textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
         }}
       >
-        {expanded ? movie.overview : `${movie.overview.substring(0, 100)}...`}
+        {movie.description}
       </Typography>
-      <Button size="small" color="primary" onClick={handleExpandClick}>
+      <Button onClick={handleExpandClick}>
         {expanded ? "Show Less" : "Show More"}
       </Button>
+      {expanded && (
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+          {movie.description}
+        </Typography>
+      )}
     </>
   );
 };

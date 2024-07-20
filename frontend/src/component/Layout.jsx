@@ -24,7 +24,7 @@ import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
 import MovieGrid from "./MovieGrid";
-import cinemaLogo from "../images/lOGO.png";
+import cinemaLogo from "../images/Logo.png";
 import SearchIcon from "@mui/icons-material/Search";
 import { alpha, Avatar, InputBase } from "@mui/material";
 
@@ -181,7 +181,7 @@ export default function Layout() {
               }}
             />
             <Typography variant="h6" noWrap component="div">
-              Bogo
+              Projector
             </Typography>
             <List sx={{ display: "flex", flexDirection: "row" }}>
               {[
